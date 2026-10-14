@@ -10,7 +10,14 @@ public final class BusquedaBinaria {
 
     private BusquedaBinaria() { }
 
-    /** Devuelve la posición del elemento cuya clave es igual a la buscada, o -1 si no está. */
+    /**
+     * Busca un elemento por una de sus claves.
+     *
+     * @param lista     lista ordenada por la clave
+     * @param clave     valor buscado
+     * @param extractor campo del elemento que se compara (por ejemplo Reserva::getId)
+     * @return posición del elemento, o -1 si no está
+     */
     public static <T, K extends Comparable<K>> int buscar(List<T> lista, K clave, Function<T, K> extractor) {
         int inicio = 0;
         int fin = lista.size() - 1;

@@ -13,6 +13,11 @@ import java.nio.file.Path;
  */
 public class Main {
 
+    /**
+     * Arranca la aplicación de consola.
+     *
+     * @param args opcional: [ficheroEntrada] [carpetaSalida]
+     */
     public static void main(String[] args) {
         Path entrada = Path.of(args.length > 0 ? args[0] : "data/AirTortilla_Reservas_2020.csv");
         Path salida = Path.of(args.length > 1 ? args[1] : "output");

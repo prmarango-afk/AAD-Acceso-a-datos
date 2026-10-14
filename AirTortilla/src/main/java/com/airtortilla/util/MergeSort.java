@@ -12,6 +12,13 @@ public final class MergeSort {
 
     private MergeSort() { }
 
+    /**
+     * Ordena una lista sin modificar la original.
+     *
+     * @param lista    lista a ordenar
+     * @param criterio regla de comparación entre elementos
+     * @return nueva lista ordenada
+     */
     public static <T> List<T> ordenar(List<T> lista, Comparator<? super T> criterio) {
         if (lista.size() <= 1) {
             return new ArrayList<>(lista); // caso base: ya está ordenada
@@ -22,6 +29,11 @@ public final class MergeSort {
         return mezclar(izquierda, derecha, criterio);
     }
 
+    /**
+     * Une dos listas ya ordenadas en una sola lista ordenada.
+     *
+     * @return lista con los elementos de a y b ordenados
+     */
     private static <T> List<T> mezclar(List<T> a, List<T> b, Comparator<? super T> criterio) {
         List<T> resultado = new ArrayList<>(a.size() + b.size());
         int i = 0, j = 0;

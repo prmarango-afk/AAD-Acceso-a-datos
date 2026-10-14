@@ -26,23 +26,33 @@ public class ExportadorPorPais {
 
     private final Path carpetaSalida;
 
+    /** @param carpetaSalida carpeta donde se escriben los ficheros */
     public ExportadorPorPais(Path carpetaSalida) {
         this.carpetaSalida = carpetaSalida;
     }
 
+    /** @return carpeta donde se escriben los ficheros */
     public Path getCarpetaSalida() { return carpetaSalida; }
 
-    /** @return los ficheros creados (sobrescribe los que ya existan) */
+    /**
+     * Crea un fichero por cada combinación de país de destino y fecha de reserva.
+     * Si un fichero ya existe, se sobrescribe.
+     *
+     * @param reservas reservas a exportar
+     * @return rutas de los ficheros creados
+     * @throws IOException si no se puede crear la carpeta o escribir algún fichero
+     */
     public List<Path> exportar(List<Reserva> reservas) throws IOException {
         Files.createDirectories(carpetaSalida);
 
-        // TreeMap: los ficheros salen ordenados por nombre
+        // Agrupa las reservas por nombre de fichero (ordenados alfabéticamente)
         Map<String, List<Reserva>> porFichero = new TreeMap<>();
         for (Reserva r : reservas) {
             String nombre = PREFIJO + r.getPaisDestino() + "_" + r.getFechaReserva().format(FORMATO_FECHA) + ".csv";
             porFichero.computeIfAbsent(nombre, k -> new ArrayList<>()).add(r);
         }
 
+        // Escribe cada grupo en su fichero
         List<Path> creados = new ArrayList<>();
         for (Map.Entry<String, List<Reserva>> entrada : porFichero.entrySet()) {
             Path destino = carpetaSalida.resolve(entrada.getKey());

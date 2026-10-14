@@ -12,8 +12,14 @@ import java.util.List;
  */
 public interface ReservaRepository {
 
+    /**
+     * Lee todas las reservas válidas del origen de datos.
+     *
+     * @return lista de reservas
+     * @throws IOException si no se puede acceder al origen de datos
+     */
     List<Reserva> findAll() throws IOException;
 
-    /** Errores encontrados en la última carga (líneas mal formadas, ids repetidos...). */
+    /** @return errores encontrados en la última carga (líneas mal formadas, ids repetidos...) */
     List<String> getErrores();
 }

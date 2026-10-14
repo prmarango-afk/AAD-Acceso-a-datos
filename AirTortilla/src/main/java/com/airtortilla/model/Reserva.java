@@ -18,6 +18,18 @@ public class Reserva implements Comparable<Reserva> {
     private final String numeroVuelo;
     private String localizador; // solo se asigna si 2+ pasajeros coinciden en nombre, origen y destino
 
+    /**
+     * Crea una reserva sin localizador.
+     *
+     * @param id             identificador único de la reserva
+     * @param nombrePasajero nombre del pasajero
+     * @param origen         ciudad de origen
+     * @param paisOrigen     código ISO de 2 letras del país de origen
+     * @param destino        ciudad de destino
+     * @param paisDestino    código ISO de 2 letras del país de destino
+     * @param fechaReserva   fecha en que se hizo la reserva
+     * @param numeroVuelo    número de vuelo
+     */
     public Reserva(String id, String nombrePasajero, String origen, String paisOrigen,
                    String destino, String paisDestino, LocalDate fechaReserva, String numeroVuelo) {
         this.id = id;
@@ -31,6 +43,8 @@ public class Reserva implements Comparable<Reserva> {
         this.localizador = "";
     }
 
+    // Getters
+
     public String getId() { return id; }
     public String getNombrePasajero() { return nombrePasajero; }
     public String getOrigen() { return origen; }
@@ -41,14 +55,16 @@ public class Reserva implements Comparable<Reserva> {
     public String getNumeroVuelo() { return numeroVuelo; }
     public String getLocalizador() { return localizador; }
 
+    /** @param localizador código del grupo al que pertenece la reserva (por ejemplo LOC-0001) */
     public void setLocalizador(String localizador) { this.localizador = localizador; }
 
-    /** Orden natural: por id. */
+    /** Compara dos reservas por id (orden natural). */
     @Override
     public int compareTo(Reserva otra) {
         return this.id.compareTo(otra.id);
     }
 
+    /** Devuelve la reserva en una línea con columnas alineadas, para mostrarla en consola. */
     @Override
     public String toString() {
         return String.format("%-6s | %-18s | %-10s (%s) -> %-10s (%s) | %s | %-7s | %s",

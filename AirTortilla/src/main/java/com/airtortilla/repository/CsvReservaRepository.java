@@ -27,10 +27,18 @@ public class CsvReservaRepository implements ReservaRepository {
     private final Path fichero;
     private final List<String> errores = new ArrayList<>();
 
+    /** @param fichero ruta del CSV de entrada */
     public CsvReservaRepository(Path fichero) {
         this.fichero = fichero;
     }
 
+    /**
+     * Lee el CSV línea a línea. Las líneas incorrectas o con id repetido se descartan
+     * y se guardan en la lista de errores.
+     *
+     * @return reservas válidas, en el orden del fichero
+     * @throws IOException si no se puede abrir o leer el fichero
+     */
     @Override
     public List<Reserva> findAll() throws IOException {
         errores.clear();
@@ -58,6 +66,14 @@ public class CsvReservaRepository implements ReservaRepository {
         return reservas;
     }
 
+    /**
+     * Convierte una línea del CSV en una Reserva, validando sus campos.
+     *
+     * @param linea línea del CSV (sin la cabecera)
+     * @return la reserva creada
+     * @throws IllegalArgumentException si faltan columnas, hay campos vacíos o el país no es ISO
+     * @throws DateTimeParseException   si la fecha no tiene el formato yyyy-MM-dd
+     */
     private Reserva parsear(String linea) {
         String[] c = linea.split(SEPARADOR, -1);
         if (c.length != NUM_COLUMNAS) {
@@ -75,6 +91,7 @@ public class CsvReservaRepository implements ReservaRepository {
                 LocalDate.parse(c[6]), c[7]);
     }
 
+    /** @return errores de la última carga, con su número de línea */
     @Override
     public List<String> getErrores() {
         return errores;

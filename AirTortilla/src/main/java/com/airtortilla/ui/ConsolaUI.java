@@ -25,6 +25,12 @@ public class ConsolaUI {
     private final ConsultaFicheros consulta;
     private Path ficheroEntrada;
 
+    /**
+     * @param servicio       gestión de las reservas
+     * @param exportador     generador de ficheros por país
+     * @param consulta       lectura de los ficheros generados
+     * @param ficheroEntrada CSV que se carga por defecto
+     */
     public ConsolaUI(ReservaService servicio, ExportadorPorPais exportador,
                      ConsultaFicheros consulta, Path ficheroEntrada) {
         this.servicio = servicio;
@@ -33,6 +39,7 @@ public class ConsolaUI {
         this.ficheroEntrada = ficheroEntrada;
     }
 
+    /** Muestra el menú y ejecuta las opciones elegidas hasta que el usuario sale. */
     public void iniciar() {
         System.out.println("=== AirTortilla Booking System ===");
         boolean salir = false;
@@ -59,6 +66,7 @@ public class ConsolaUI {
         System.out.println("¡Hasta luego!");
     }
 
+    /** Muestra el estado actual y las opciones del menú. */
     private void mostrarMenu() {
         System.out.println();
         System.out.println("Fichero de entrada: " + ficheroEntrada
@@ -75,6 +83,7 @@ public class ConsolaUI {
         System.out.print("> ");
     }
 
+    /** Opción 1: pide la ruta del CSV, lo carga y muestra el resumen de la carga. */
     private void cargarCsv() throws IOException {
         System.out.print("Ruta del CSV [Enter = " + ficheroEntrada + "]: ");
         String ruta = sc.nextLine().trim();
@@ -93,6 +102,7 @@ public class ConsolaUI {
         errores.forEach(e -> System.out.println("       - " + e));
     }
 
+    /** @return true si hay reservas cargadas; si no, avisa al usuario */
     private boolean comprobarDatos() {
         if (!servicio.hayDatos()) {
             System.out.println("Primero carga el CSV (opción 1).");
@@ -101,6 +111,7 @@ public class ConsolaUI {
         return true;
     }
 
+    /** Opción 2: genera los ficheros por país de destino y muestra los creados. */
     private void generarFicheros() throws IOException {
         if (!comprobarDatos()) return;
         List<Path> creados = exportador.exportar(servicio.getReservas());
@@ -109,6 +120,11 @@ public class ConsolaUI {
         creados.forEach(p -> System.out.println("  - " + p.getFileName()));
     }
 
+    /**
+     * Opción 3: muestra los ficheros generados numerados.
+     *
+     * @return los ficheros mostrados
+     */
     private List<Path> listarFicheros() throws IOException {
         List<Path> ficheros = consulta.listar();
         if (ficheros.isEmpty()) {
@@ -120,6 +136,11 @@ public class ConsolaUI {
         return ficheros;
     }
 
+    /**
+     * Opciones 4 y 5: pide un fichero y lo muestra entero o línea a línea.
+     *
+     * @param total true para mostrarlo entero, false para línea a línea
+     */
     private void consultarFichero(boolean total) throws IOException {
         List<Path> ficheros = listarFicheros();
         if (ficheros.isEmpty()) return;
@@ -149,6 +170,7 @@ public class ConsolaUI {
         System.out.println("--- fin ---");
     }
 
+    /** Opción 6: pide un criterio y muestra las reservas ordenadas. */
     private void listarOrdenadas() {
         if (!comprobarDatos()) return;
         ReservaService.Criterio[] criterios = ReservaService.Criterio.values();
@@ -169,6 +191,7 @@ public class ConsolaUI {
         servicio.ordenar(criterios[n - 1]).forEach(System.out::println);
     }
 
+    /** Opción 7: pide un id y muestra la reserva. */
     private void buscarPorId() {
         if (!comprobarDatos()) return;
         System.out.print("Id de la reserva: ");
@@ -176,6 +199,7 @@ public class ConsolaUI {
         System.out.println(r.map(Reserva::toString).orElse("No existe ninguna reserva con ese id."));
     }
 
+    /** Opción 8: pide un localizador y muestra todas las reservas del grupo. */
     private void buscarPorLocalizador() {
         if (!comprobarDatos()) return;
         System.out.print("Localizador (p. ej. LOC-0001): ");
