@@ -1,6 +1,6 @@
 # AirTortilla Booking System
 
-Aplicación de consola en Java que lee las reservas de AirTortilla desde un fichero CSV, asigna
+Aplicación de escritorio en Java que lee las reservas de AirTortilla desde un fichero CSV, asigna
 **localizadores** a los pasajeros coincidentes y **divide las reservas en ficheros por país de destino**.
 
 ## Stack tecnológico
@@ -9,7 +9,7 @@ Aplicación de consola en Java que lee las reservas de AirTortilla desde un fich
 |---|---|
 | Lenguaje | Java 21 (Temurin) |
 | Build | Maven |
-| Interfaz | Terminal (consola) |
+| Interfaz | Gráfica con Swing (por defecto) y terminal (`--consola`) |
 | Persistencia | Ficheros CSV |
 | IDE | IntelliJ IDEA |
 
@@ -17,11 +17,12 @@ Aplicación de consola en Java que lee las reservas de AirTortilla desde un fich
 
 1. Abrir la carpeta `AirTortilla` en IntelliJ (*File → Open*). IntelliJ detecta el `pom.xml`.
 2. Copiar el CSV de datos en `data/AirTortilla_Reservas_2020.csv` (no está en el repo; ver formato abajo).
-   Para probar rápido se puede usar `data/ejemplo_reservas.csv` (opción 1 del menú → escribir su ruta).
-3. Ejecutar `com.airtortilla.Main` (botón ▶ junto al `main`).
+   Para probar rápido se puede usar `data/ejemplo_reservas.csv` (botón *Examinar...*).
+3. Ejecutar `com.airtortilla.Main` (botón ▶ junto al `main`). Se abre la ventana.
 
-Opcionalmente se pueden pasar argumentos: `[ficheroEntrada] [carpetaSalida]`
-(por defecto `data/AirTortilla_Reservas_2020.csv` y `output/`).
+Argumentos opcionales: `[--consola] [ficheroEntrada] [carpetaSalida]`
+(por defecto interfaz gráfica, `data/AirTortilla_Reservas_2020.csv` y `output/`).
+Con `--consola` se usa el menú de terminal en lugar de la ventana.
 
 ## Formato del CSV de entrada
 
@@ -64,7 +65,16 @@ localizador (`LOC-0001`, `LOC-0002`...). Los datos de prueba incluyen 3 casos:
 | LOC-0002 | José Rodríguez | Barcelona → Roma | 3 |
 | LOC-0003 | David Jiménez | Valencia → Nueva York | 2 |
 
-## Menú
+## Interfaz gráfica
+
+| Zona | Funciones |
+|---|---|
+| Barra superior | Elegir el CSV (*Examinar...*) y cargarlo (*Cargar CSV*) |
+| Pestaña **Reservas** | Tabla con todas las reservas · ordenar por id, fecha, pasajero o país destino · buscar por id · buscar por localizador |
+| Pestaña **Ficheros por país** | Crear los ficheros por país de destino · lista de ficheros generados · ver un fichero completo o línea a línea (botón *Siguiente línea*) |
+| Panel inferior | Feedback de cada operación con la hora (reservas leídas, errores, ficheros creados...) |
+
+## Menú de consola (`--consola`)
 
 ```
 1. Cargar CSV de reservas
@@ -117,13 +127,15 @@ src/main/java/com/airtortilla
 ├── util/
 │   ├── MergeSort.java            Ordenación genérica O(n log n)
 │   └── BusquedaBinaria.java      Búsqueda O(log n)
-└── ui/ConsolaUI.java             Interfaz de terminal
+└── ui/
+    ├── VentanaPrincipal.java     Interfaz gráfica (Swing)
+    └── ConsolaUI.java            Interfaz de terminal
 ```
 
 Por capas: la interfaz solo habla con los servicios, y los servicios no saben de dónde vienen los datos.
 Para migrar a otra fuente (por ejemplo una base de datos con JDBC) basta con añadir otra
 implementación de `ReservaRepository`, sin tocar el resto. Para otra interfaz (web, JavaFX), basta con
-sustituir `ConsolaUI`.
+añadir otra clase en `ui` (así se hizo en la versión 1.1.0 con `VentanaPrincipal`, sin cambiar ningún servicio).
 
 ## Complejidad algorítmica
 
@@ -141,3 +153,4 @@ sustituir `ConsolaUI`.
 | Versión | Fecha | Cambios |
 |---|---|---|
 | 1.0.0 | 2026-10-14 | Primera entrega: lectura de CSV, localizadores, ficheros por país de destino, consulta total y línea a línea, ordenación y búsqueda. Stack: Java 21 + consola + ficheros. |
+| 1.1.0 | 2026-10-14 | **Migración de interfaz: terminal → interfaz gráfica nativa (Swing).** Nueva clase `VentanaPrincipal` con pestañas de reservas y ficheros, y panel de feedback. La consola se mantiene con `--consola`. Los servicios no cambian; solo se añade `ConsultaFicheros.abrir()` para la lectura línea a línea desde botones. |

@@ -51,6 +51,19 @@ public class ConsultaFicheros {
     }
 
     /**
+     * Abre un fichero para leerlo poco a poco (lo usa la interfaz gráfica,
+     * que pide una línea cada vez que se pulsa "Siguiente línea").
+     * Quien lo llame debe cerrarlo al terminar.
+     *
+     * @param fichero fichero a abrir
+     * @return lector del fichero
+     * @throws IOException si no se puede abrir el fichero
+     */
+    public BufferedReader abrir(Path fichero) throws IOException {
+        return Files.newBufferedReader(fichero, StandardCharsets.UTF_8);
+    }
+
+    /**
      * Modalidad línea a línea: lee el fichero de una línea en una.
      *
      * @param fichero fichero a leer
