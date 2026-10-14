@@ -18,8 +18,15 @@
     const c = document.createElement("canvas");
     c.width = 1024; c.height = 512;
     const ctx = c.getContext("2d");
-    ctx.fillStyle = "#c98b2c";
+    ctx.fillStyle = "#c4842a";
     ctx.fillRect(0, 0, c.width, c.height);
+    // El canto (franja central de la textura) sale más tostado que la cara de arriba
+    const canto = ctx.createLinearGradient(0, 100, 0, 370);
+    canto.addColorStop(0, "rgba(120,60,15,0)");
+    canto.addColorStop(0.5, "rgba(120,60,15,0.55)");
+    canto.addColorStop(1, "rgba(120,60,15,0)");
+    ctx.fillStyle = canto;
+    ctx.fillRect(0, 100, c.width, 270);
     // Manchas tostadas de distintos tamaños
     for (let i = 0; i < 900; i++) {
       const x = azar() * c.width, y = azar() * c.height, r = 4 + azar() * 38;
@@ -51,14 +58,14 @@
     const c = document.createElement("canvas");
     c.width = 512; c.height = 256;
     const ctx = c.getContext("2d");
-    ctx.fillStyle = "#f0cd5c";
+    ctx.fillStyle = "#e9b53a";
     ctx.fillRect(0, 0, c.width, c.height);
     // Huevo jugoso con variaciones
     for (let i = 0; i < 300; i++) {
       const x = azar() * c.width, y = azar() * c.height, r = 6 + azar() * 24;
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, `rgba(${azar() < 0.5 ? "232,182,60" : "250,222,120"},0.45)`);
-      g.addColorStop(1, "rgba(240,205,92,0)");
+      g.addColorStop(0, `rgba(${azar() < 0.5 ? "214,150,35" : "246,204,90"},0.5)`);
+      g.addColorStop(1, "rgba(233,181,58,0)");
       ctx.fillStyle = g;
       ctx.fillRect(x - r, y - r, r * 2, r * 2);
     }
@@ -71,9 +78,9 @@
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate((azar() - 0.5) * 0.35);
-        ctx.fillStyle = `rgba(${248 - azar() * 12},${234 - azar() * 18},${170 - azar() * 30},0.95)`;
+        ctx.fillStyle = `rgba(${246 - azar() * 10},${218 - azar() * 18},${128 - azar() * 30},0.92)`;
         ctx.beginPath(); ctx.ellipse(0, 0, w, h, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = "rgba(200,160,70,0.5)";
+        ctx.strokeStyle = "rgba(190,140,50,0.55)";
         ctx.lineWidth = 1.2;
         ctx.stroke();
         ctx.restore();
@@ -105,13 +112,13 @@
   // ---------- Escena ----------
   const escena = new THREE.Scene();
   const camara = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
-  camara.position.set(0, 2.0, 3.2);
+  camara.position.set(0, 2.3, 3.7);
   camara.lookAt(0, -0.05, 0);
   const render = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   render.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   render.outputEncoding = THREE.sRGBEncoding;
   render.toneMapping = THREE.ACESFilmicToneMapping;
-  render.toneMappingExposure = 1.05;
+  render.toneMappingExposure = 0.95;
   cont.appendChild(render.domElement);
 
   // Sin mapa de entorno (PMREM falla en algunas gráficas): los brillos salen de las luces
@@ -146,10 +153,10 @@
 
   // ---------- Tortilla ----------
   // Perfil: de arriba (centro) al borde redondeado y a la base
-  const R = 1, H = 0.24;
+  const R = 1, H = 0.26;
   const perfil = [];
-  perfil.push(new THREE.Vector2(0, H + 0.03));
-  for (let i = 1; i <= 8; i++) perfil.push(new THREE.Vector2((R - 0.2) * i / 8, H + 0.03 * (1 - (i / 8) ** 2)));
+  perfil.push(new THREE.Vector2(0, H + 0.07));
+  for (let i = 1; i <= 8; i++) perfil.push(new THREE.Vector2((R - 0.2) * i / 8, H + 0.07 * (1 - (i / 8) ** 2)));
   for (let i = 1; i <= 14; i++) { // borde redondeado
     const a = Math.PI / 2 - (i / 14) * Math.PI;
     perfil.push(new THREE.Vector2(R - 0.2 + 0.2 * Math.cos(a), H * Math.sin(a) * 1.0));
@@ -180,23 +187,68 @@
     const g = new THREE.ShapeGeometry(s, 24);
     // Coordenadas UV para que la textura interior cubra la cara
     const pos = g.attributes.position, uv = g.attributes.uv;
-    for (let i = 0; i < pos.count; i++) uv.setXY(i, pos.getX(i) / R, (pos.getY(i) + H) / (2 * H + 0.03));
+    for (let i = 0; i < pos.count; i++) uv.setXY(i, pos.getX(i) / R, (pos.getY(i) + H) / (2 * H + 0.07));
     g.rotateY(angulo - Math.PI / 2);
     return new THREE.Mesh(g, matInterior);
+  }
+
+  /** Abolla la parte de arriba para que no sea perfectamente lisa (igual en la costra y en los cortes). */
+  function abollar(geo) {
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+      if (y <= 0) continue;
+      const peso = Math.min(1, y / H); // nada en la base, todo arriba
+      const bulto = Math.sin(x * 5.1 + 1.3) * Math.cos(z * 4.3) * 0.022
+        + Math.sin((x + z) * 9.7) * 0.008 + Math.cos(x * 13.1 - z * 11.3) * 0.004;
+      pos.setY(i, y + bulto * peso);
+    }
+    geo.computeVertexNormals();
+    return geo;
   }
 
   /** Una porción de tortilla entre dos ángulos, con sus dos caras de corte. */
   function porcion(desde, abertura) {
     const grupo = new THREE.Group();
-    grupo.add(new THREE.Mesh(new THREE.LatheGeometry(perfil, 128, desde, abertura), matCostra));
-    grupo.add(caraCorte(desde));
-    grupo.add(caraCorte(desde + abertura));
+    grupo.add(new THREE.Mesh(abollar(new THREE.LatheGeometry(perfil, 128, desde, abertura)), matCostra));
+    [desde, desde + abertura].forEach((a) => {
+      const cara = caraCorte(a);
+      abollar(cara.geometry);
+      grupo.add(cara);
+    });
+    return grupo;
+  }
+
+  /** Ramita de perejil para decorar. */
+  function perejil() {
+    const grupo = new THREE.Group();
+    const verde = new THREE.MeshStandardMaterial({ color: 0x2f7d2a, roughness: 0.5, side: THREE.DoubleSide });
+    const hoja = new THREE.Shape();
+    hoja.moveTo(0, 0);
+    hoja.bezierCurveTo(0.05, 0.03, 0.07, 0.09, 0, 0.14);
+    hoja.bezierCurveTo(-0.07, 0.09, -0.05, 0.03, 0, 0);
+    const geoHoja = new THREE.ShapeGeometry(hoja, 8);
+    for (let i = 0; i < 7; i++) {
+      const h = new THREE.Mesh(geoHoja, verde);
+      const a = (i / 7) * Math.PI * 2;
+      h.position.set(Math.cos(a) * 0.03, 0, Math.sin(a) * 0.03);
+      h.rotation.set(-Math.PI / 2 + 0.35, 0, -a + Math.PI / 2);
+      h.scale.setScalar(0.8 + (i % 3) * 0.15);
+      grupo.add(h);
+    }
+    const tallo = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.008, 0.18, 6), new THREE.MeshStandardMaterial({ color: 0x4a8f35 }));
+    tallo.rotation.z = Math.PI / 2.4;
+    tallo.position.set(0.08, 0.01, 0);
+    grupo.add(tallo);
     return grupo;
   }
 
   const HUECO = 0.95; // ángulo del trozo cortado
   const tortilla = porcion(HUECO / 2, Math.PI * 2 - HUECO);
   conjunto.add(tortilla);
+  const ramita = perejil();
+  ramita.position.set(-0.25, H + 0.08, -0.2);
+  conjunto.add(ramita);
   // El trozo servido, un poco separado
   const trozo = porcion(-HUECO / 2, HUECO);
   trozo.position.set(0, 0.0, 0.42);

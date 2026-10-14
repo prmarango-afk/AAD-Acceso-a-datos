@@ -13,11 +13,13 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Punto de entrada. Elige la interfaz según los argumentos:
  * <ul>
- *   <li>(sin argumentos) interfaz web en http://localhost:8080</li>
+ *   <li>(sin argumentos) menú para elegir entre terminal y web</li>
+ *   <li>{@code --web} interfaz web en http://localhost:8080</li>
  *   <li>{@code --swing} ventana de escritorio</li>
  *   <li>{@code --consola} menú de terminal</li>
  * </ul>
@@ -36,8 +38,42 @@ public class Main {
             arrancarEscritorio(args, true);
         } else if (lista.contains("--swing")) {
             arrancarEscritorio(args, false);
+        } else if (lista.contains("--web")) {
+            AirTortillaWebApp.arrancar(args);
+        } else if (elegirVersion() == 1) {
+            arrancarEscritorio(args, true);
         } else {
             AirTortillaWebApp.arrancar(args);
+        }
+    }
+
+    /**
+     * Pregunta qué versión arrancar antes de empezar.
+     *
+     * @return 1 para la terminal, 2 para la web
+     */
+    private static int elegirVersion() {
+        System.out.println();
+        System.out.println("  ╔══════════════════════════════════════════════════════════════╗");
+        System.out.println("  ║               AirTortilla Booking System · AAD               ║");
+        System.out.println("  ╠══════════════════════════════════════════════════════════════╣");
+        System.out.println("  ║  1. Versión clásica: terminal                                ║");
+        System.out.println("  ║     (sosa, pero cumple todo el enunciado)                    ║");
+        System.out.println("  ║                                                              ║");
+        System.out.println("  ║  2. Versión para atrevidos: web 3D                           ║");
+        System.out.println("  ║     (devoradora de tokens · frontend hecho con IA)           ║");
+        System.out.println("  ╚══════════════════════════════════════════════════════════════╝");
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            System.out.print("  Elige versión (1/2): ");
+            if (!sc.hasNextLine()) return 2;
+            String opcion = sc.nextLine().trim();
+            if (opcion.equals("1")) return 1;
+            if (opcion.equals("2")) {
+                System.out.println("  Despegando… se abrirá el navegador en http://localhost:8080");
+                return 2;
+            }
+            System.out.println("  Opción no válida.");
         }
     }
 

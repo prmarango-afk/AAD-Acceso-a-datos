@@ -22,14 +22,17 @@ Aplicación web en Java (Spring Boot) que lee las reservas de AirTortilla desde 
    (la primera vez tarda un poco; si no lo hace solo, pulsa el icono de Maven ⟳ *Reload*).
 2. Copiar el CSV de datos en `data/AirTortilla_Reservas_2020.csv` (no está en el repo; ver formato abajo).
    También se puede **arrastrar cualquier CSV** a la página.
-3. Ejecutar `com.airtortilla.Main` (botón ▶ junto al `main`). Arranca el servidor y se abre el navegador en
-   **http://localhost:8080**. Para pararlo, el botón ■ rojo de IntelliJ.
+3. Ejecutar `com.airtortilla.Main` (botón ▶ junto al `main`). En la consola de IntelliJ aparece un menú para elegir versión:
+   - **1 · Versión clásica (terminal)**: el menú de texto de la v1.0.
+   - **2 · Versión para atrevidos (web 3D)**: arranca el servidor y abre el navegador en **http://localhost:8080**.
+     Para pararlo, el botón ■ rojo de IntelliJ.
 
 Argumentos opcionales:
 
 | Argumentos | Interfaz |
 |---|---|
-| *(ninguno)* | Web en http://localhost:8080 |
+| *(ninguno)* | Menú para elegir entre terminal (1) y web (2) |
+| `--web` | Web en http://localhost:8080, sin preguntar |
 | `--swing [ficheroEntrada] [carpetaSalida]` | Ventana de escritorio Swing |
 | `--consola [ficheroEntrada] [carpetaSalida]` | Menú de terminal |
 
@@ -216,4 +219,6 @@ sin cambiar la lógica de ningún servicio. Las tres interfaces siguen funcionan
 |---|---|---|
 | 1.0.0 | 2026-10-14 | Primera entrega: lectura de CSV, localizadores, ficheros por país de destino, consulta total y línea a línea, ordenación y búsqueda. Stack: Java 21 + consola + ficheros. |
 | 1.1.0 | 2026-10-14 | **Migración de interfaz: terminal → interfaz gráfica nativa (Swing).** Nueva clase `VentanaPrincipal` con pestañas de reservas y ficheros, y panel de feedback. La consola se mantiene con `--consola`. Los servicios no cambian; solo se añade `ConsultaFicheros.abrir()` para la lectura línea a línea desde botones. |
-| 2.0.0 | 2026-10-14 | **Migración de interfaz: escritorio → web.** Se añade Spring Boot: `AirTortillaWebApp` arranca un servidor en localhost:8080 y `ReservaController` expone una API REST en JSON. Página nueva en HTML/CSS/JS con estética de aeropuerto, globo 3D con Three.js, subida de CSV por arrastre y visor de ficheros. La web pasa a ser la interfaz por defecto; Swing (`--swing`) y consola (`--consola`) se mantienen. En los servicios solo se añade `ReservaService.getGruposLocalizador()`. |
+| 2.0.0 | 2026-10-14 | **Migración de interfaz: escritorio → web.** Se añade Spring Boot: `AirTortillaWebApp` arranca un servidor en localhost:8080 y `ReservaController` expone una API REST en JSON. Página nueva en HTML/CSS/JS con estética de aeropuerto, globo 3D con Three.js, subida de CSV por arrastre y visor de ficheros. Al arrancar se elige entre la terminal y la web; Swing (`--swing`) se mantiene. En los servicios solo se añade `ReservaService.getGruposLocalizador()`. |
+
+> **Nota sobre el uso de IA:** el frontend web (HTML, CSS, JavaScript y escenas 3D con Three.js) se ha desarrollado con ayuda de IA. Así lo indican también el menú de inicio y el pie de la página.

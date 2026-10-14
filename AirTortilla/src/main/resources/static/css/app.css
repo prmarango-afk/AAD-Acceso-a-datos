@@ -374,3 +374,8 @@ canvas.despegue.activo { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- Nota sobre el uso de IA ---------- */
+.credito { display: grid; justify-items: center; gap: 8px; margin: 56px auto 0; max-width: 62ch; text-align: center; }
+.credito p { margin: 0; color: var(--subtle); font-size: 13px; line-height: 1.6; }
+.credito b { color: var(--muted); }
