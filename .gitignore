@@ -1,7 +1,16 @@
+# Compilados
 out/
+target/
 build/
-.gradle/
 *.class
-.idea/workspace.xml
-.idea/caches/
-local.properties
+
+# IntelliJ
+.idea/
+*.iml
+
+# Datos (no se suben)
+*.csv
+!**/ejemplo*.csv
+
+# Ficheros generados por la aplicación
+**/output/
