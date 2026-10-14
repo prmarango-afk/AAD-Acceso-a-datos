@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AirTortilla · Salidas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23FFB627'/%3E%3Cpath d='M8 18l16-6-4 8z' fill='%230B1020'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- Filtro SVG del "cristal líquido": deforma ligeramente lo que hay detrás del panel -->
+<svg class="filtros" aria-hidden="true">
+  <filter id="liquido" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.006 0.009" numOctaves="2" seed="3" result="ruido"/>
+    <feGaussianBlur in="ruido" stdDeviation="2" result="suave"/>
+    <feDisplacementMap in="SourceGraphic" in2="suave" scale="38" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<!-- Fondo: auroras que se mueven (dan color al cristal) -->
+<div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+<div class="estrellas" aria-hidden="true"></div>
+
+<!-- Barra superior -->
+<header class="topbar glass liquid">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="14"/><path d="M7 18.5 25 11l-4.5 9.5-4-2.5-3 4-.5-5z"/></svg>
+    </span>
+    <div>
+      <b>AirTortilla</b>
+      <span>Booking System</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="file-chip" id="chip-fichero" hidden></span>
+    <time class="clock" id="reloj">--:--</time>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- Cabecera -->
+  <section class="hero">
+    <div class="hero-title">
+      <span class="badge"><span class="dot"></span>Terminal de reservas · AAD</span>
+      <h1>Salidas</h1>
+      <p class="hero-sub">Carga el CSV de reservas, asigna localizadores y reparte las reservas en un fichero por país de destino.</p>
+      <div class="counters" aria-live="polite">
+        <div class="counter glass"><span>Reservas</span><b class="flap-num" id="n-reservas">000</b></div>
+        <div class="counter glass"><span>Localizadores</span><b class="flap-num" id="n-localizadores">00</b></div>
+        <div class="counter glass"><span>Ficheros</span><b class="flap-num" id="n-ficheros">00</b></div>
+        <div class="counter glass warn"><span>Descartadas</span><b class="flap-num" id="n-errores">00</b></div>
+      </div>
+    </div>
+    <div class="globe" id="globo" aria-label="Globo terráqueo con las rutas de las reservas">
+      <span class="globe-hint glass">Arrastra para girar</span>
+    </div>
+  </section>
+
+  <!-- Carga del CSV + tortilla -->
+  <section class="load">
+    <label class="dropzone glass" id="dropzone" for="input-fichero">
+      <input type="file" id="input-fichero" accept=".csv,text/csv">
+      <span class="drop-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+      </span>
+      <span class="drop-text"><b>Arrastra aquí un CSV de reservas</b> o haz clic para elegirlo</span>
+      <span class="drop-hint">Separador <kbd>;</kbd> · 8 columnas · UTF-8</span>
+      <span class="load-actions">
+        <button type="button" class="btn btn-primary" id="btn-defecto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+          Cargar CSV por defecto
+        </button>
+        <button type="button" class="btn btn-amber" id="btn-generar" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 16l20-6-5 9-4-3-3 4-1-6z"/></svg>
+          Crear ficheros por país
+        </button>
+      </span>
+    </label>
+
+    <figure class="tortilla-card glass">
+      <div class="tortilla" id="tortilla" aria-label="Tortilla de patatas en 3D"></div>
+      <figcaption>
+        <span class="badge small">Especialidad de a bordo</span>
+        <b>Tortilla de patatas</b>
+        <span>Con cebolla, por supuesto. Arrástrala para girarla.</span>
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- Pestañas -->
+  <nav class="tabs glass" role="tablist" aria-label="Secciones">
+    <button role="tab" class="tab" id="tab-salidas" aria-selected="true" aria-controls="panel-salidas">Panel de salidas</button>
+    <button role="tab" class="tab" id="tab-pasajeros" aria-selected="false" aria-controls="panel-pasajeros">Pasajeros</button>
+    <button role="tab" class="tab" id="tab-grupos" aria-selected="false" aria-controls="panel-grupos">Localizadores</button>
+  </nav>
+
+  <!-- Panel de salidas: ficheros generados -->
+  <section class="panel" id="panel-salidas" role="tabpanel" aria-labelledby="tab-salidas">
+    <div class="board glass">
+      <div class="board-head">
+        <span>Fecha</span><span>Destino</span><span>País</span><span>Reservas</span><span>Fichero</span><span>Estado</span>
+      </div>
+      <div class="board-body" id="board-body">
+        <div class="empty" id="board-empty">
+          <b>Sin salidas programadas</b>
+          <span>Carga un CSV y pulsa «Crear ficheros por país».</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pasajeros: tabla de reservas -->
+  <section class="panel" id="panel-pasajeros" role="tabpanel" aria-labelledby="tab-pasajeros" hidden>
+    <div class="toolbar glass">
+      <div class="field">
+        <label for="sel-orden">Ordenar por</label>
+        <select id="sel-orden">
+          <option value="ID">Id</option>
+          <option value="FECHA">Fecha</option>
+          <option value="PASAJERO">Pasajero</option>
+          <option value="PAIS_DESTINO">País destino</option>
+        </select>
+      </div>
+      <form class="field search" id="form-id">
+        <label for="input-id">Buscar id</label>
+        <div class="input-group">
+          <input id="input-id" type="text" placeholder="R0005" autocomplete="off">
+          <button class="btn btn-ghost" type="submit">Buscar</button>
+        </div>
+      </form>
+      <div class="field filter">
+        <label for="input-filtro">Filtrar</label>
+        <input id="input-filtro" type="text" placeholder="Nombre, ciudad o país…" autocomplete="off">
+      </div>
+      <button class="btn btn-ghost" id="btn-todas" hidden>Mostrar todas</button>
+    </div>
+    <p class="algo-note" id="algo-note">Ordenado con <b>MergeSort</b> · O(n log n)</p>
+    <div class="table-wrap glass">
+      <table class="pax">
+        <thead><tr><th>Id</th><th>Pasajero</th><th>Ruta</th><th>Fecha</th><th>Vuelo</th><th>Localizador</th></tr></thead>
+        <tbody id="tbody-pax"></tbody>
+      </table>
+      <div class="empty" id="pax-empty"><b>No hay reservas cargadas</b><span>Empieza cargando un CSV.</span></div>
+    </div>
+  </section>
+
+  <!-- Localizadores: tarjetas de embarque -->
+  <section class="panel" id="panel-grupos" role="tabpanel" aria-labelledby="tab-grupos" hidden>
+    <p class="algo-note">Reservas que coinciden en <b>nombre + origen + destino</b> · agrupadas con un <b>Map</b> en O(n)</p>
+    <div class="passes" id="passes"></div>
+    <div class="empty" id="grupos-empty"><b>Sin localizadores</b><span>Aparecen cuando 2 o más reservas coinciden en nombre, origen y destino.</span></div>
+  </section>
+
+</main>
+
+<!-- Visor de ficheros -->
+<div class="viewer-backdrop" id="viewer-backdrop" hidden></div>
+<aside class="viewer glass" id="viewer" aria-labelledby="viewer-title" hidden>
+  <header class="viewer-head">
+    <div>
+      <span class="badge small" id="viewer-eyebrow">Fichero</span>
+      <h2 id="viewer-title">—</h2>
+    </div>
+    <button class="icon-btn" id="viewer-close" aria-label="Cerrar visor">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </header>
+  <div class="viewer-modes" role="group" aria-label="Modo de lectura">
+    <div class="segmented">
+      <button class="mode" id="mode-total" aria-pressed="true">Completo</button>
+      <button class="mode" id="mode-linea" aria-pressed="false">Línea a línea</button>
+    </div>
+  </div>
+  <div class="viewer-body">
+    <ol class="lines" id="viewer-lines"></ol>
+  </div>
+  <footer class="viewer-foot" id="viewer-foot" hidden>
+    <span id="viewer-progress">Línea 0</span>
+    <button class="btn btn-amber" id="btn-siguiente">Siguiente línea <kbd>Espacio</kbd></button>
+  </footer>
+</aside>
+
+<!-- Torre de control: feedback de las operaciones -->
+<aside class="tower glass liquid" id="tower" aria-live="polite">
+  <button class="tower-head" id="tower-toggle" aria-expanded="false">
+    <span class="tower-dot"></span>
+    <span class="tower-title">Torre de control</span>
+    <span class="tower-last" id="tower-last">Sistema listo</span>
+    <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>
+  </button>
+  <ol class="tower-log" id="tower-log" hidden></ol>
+</aside>
+
+<script src="lib/three.min.js"></script>
+<script src="js/globo.js"></script>
+<script src="js/tortilla.js"></script>
+<script src="js/despegue.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

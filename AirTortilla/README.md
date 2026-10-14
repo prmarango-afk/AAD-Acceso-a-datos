@@ -1,7 +1,9 @@
 # AirTortilla Booking System
 
-Aplicación de escritorio en Java que lee las reservas de AirTortilla desde un fichero CSV, asigna
+Aplicación web en Java (Spring Boot) que lee las reservas de AirTortilla desde un fichero CSV, asigna
 **localizadores** a los pasajeros coincidentes y **divide las reservas en ficheros por país de destino**.
+
+![Interfaz web](docs/interfaz_web.png)
 
 ## Stack tecnológico
 
@@ -9,20 +11,30 @@ Aplicación de escritorio en Java que lee las reservas de AirTortilla desde un f
 |---|---|
 | Lenguaje | Java 21 (Temurin) |
 | Build | Maven |
-| Interfaz | Gráfica con Swing (por defecto) y terminal (`--consola`) |
+| Backend | Spring Boot 3.3 (API REST que devuelve JSON) |
+| Interfaz | **Web** (HTML + CSS + JavaScript, estilo Liquid Glass, Three.js: globo terráqueo, avión y tortilla 3D) · alternativas: Swing (`--swing`) y terminal (`--consola`) |
 | Persistencia | Ficheros CSV |
 | IDE | IntelliJ IDEA |
 
 ## Cómo ejecutarlo
 
-1. Abrir la carpeta `AirTortilla` en IntelliJ (*File → Open*). IntelliJ detecta el `pom.xml`.
+1. Abrir la carpeta `AirTortilla` en IntelliJ (*File → Open*). IntelliJ detecta el `pom.xml` y descarga Spring Boot
+   (la primera vez tarda un poco; si no lo hace solo, pulsa el icono de Maven ⟳ *Reload*).
 2. Copiar el CSV de datos en `data/AirTortilla_Reservas_2020.csv` (no está en el repo; ver formato abajo).
-   Para probar rápido se puede usar `data/ejemplo_reservas.csv` (botón *Examinar...*).
-3. Ejecutar `com.airtortilla.Main` (botón ▶ junto al `main`). Se abre la ventana.
+   También se puede **arrastrar cualquier CSV** a la página.
+3. Ejecutar `com.airtortilla.Main` (botón ▶ junto al `main`). Arranca el servidor y se abre el navegador en
+   **http://localhost:8080**. Para pararlo, el botón ■ rojo de IntelliJ.
 
-Argumentos opcionales: `[--consola] [ficheroEntrada] [carpetaSalida]`
-(por defecto interfaz gráfica, `data/AirTortilla_Reservas_2020.csv` y `output/`).
-Con `--consola` se usa el menú de terminal en lugar de la ventana.
+Argumentos opcionales:
+
+| Argumentos | Interfaz |
+|---|---|
+| *(ninguno)* | Web en http://localhost:8080 |
+| `--swing [ficheroEntrada] [carpetaSalida]` | Ventana de escritorio Swing |
+| `--consola [ficheroEntrada] [carpetaSalida]` | Menú de terminal |
+
+En la web, las rutas y el puerto se cambian en `src/main/resources/application.properties`.
+Three.js y las texturas de la Tierra (NASA Blue Marble, vía three-globe) están incluidas en `static/`, así que todo funciona sin internet (solo las fuentes tipográficas vienen de Google Fonts).
 
 ## Formato del CSV de entrada
 
@@ -65,7 +77,40 @@ localizador (`LOC-0001`, `LOC-0002`...). Los datos de prueba incluyen 3 casos:
 | LOC-0002 | José Rodríguez | Barcelona → Roma | 3 |
 | LOC-0003 | David Jiménez | Valencia → Nueva York | 2 |
 
-## Interfaz gráfica
+## Interfaz web
+
+Estética *Liquid Glass*: paneles de cristal translúcido que desenfocan y refractan el fondo (filtro SVG de desplazamiento) sobre un cielo nocturno, con elementos de panel de salidas de aeropuerto.
+
+| Zona | Funciones |
+|---|---|
+| Cabecera | Contadores con animación *split-flap* (reservas, localizadores, ficheros, líneas descartadas) y **globo terráqueo 3D** con texturas reales (día, noche con luces de ciudades, reflejo del sol en el mar y atmósfera), las rutas de las reservas y aviones volando (arrastrable) |
+| Carga | Arrastrar un CSV a la página o cargar el CSV por defecto · botón *Crear ficheros por país*: al pulsarlo cruza la pantalla un **avión de pasajeros 3D** con estelas |
+| Tortilla | **Tortilla de patatas 3D** en un plato, con un trozo cortado que muestra el interior y vapor (arrastrable) |
+| **Panel de salidas** | Los ficheros generados como un tablero de aeropuerto (fecha, país, nº de reservas). Al pulsar uno se abre el visor: **completo** o **línea a línea** (botón *Siguiente línea* o tecla Espacio) |
+| **Pasajeros** | Tabla de reservas · ordenar con MergeSort · buscar por id (búsqueda binaria) · filtro de texto · pulsar un localizador muestra su grupo |
+| **Localizadores** | Cada grupo como una tarjeta de embarque con el nº de pasajeros |
+| Torre de control | Feedback de cada operación con la hora (desplegable) |
+
+### API REST
+
+La página llama a estas URLs (`web/ReservaController.java`), que usan los mismos servicios que Swing y la consola:
+
+| Método | URL | Qué hace |
+|---|---|---|
+| GET | `/api/estado` | Contadores y errores de la última carga |
+| POST | `/api/cargar/defecto` | Carga el CSV configurado |
+| POST | `/api/cargar` | Carga un CSV subido desde el navegador (campo `fichero`) |
+| GET | `/api/reservas?orden=FECHA` | Reservas ordenadas (`ID`, `FECHA`, `PASAJERO`, `PAIS_DESTINO`) |
+| GET | `/api/reservas/{id}` | Una reserva (búsqueda binaria) · 404 si no existe |
+| GET | `/api/localizadores` | Grupos con localizador |
+| POST | `/api/ficheros/generar` | Crea los ficheros por país de destino |
+| GET | `/api/ficheros` | Ficheros generados (nombre, país, fecha, nº de reservas) |
+| GET | `/api/ficheros/{nombre}` | Modalidad total: el fichero completo |
+| GET | `/api/ficheros/{nombre}/lineas/{n}` | Modalidad línea a línea: solo la línea `n` |
+
+Solo se pueden leer ficheros de la carpeta de salida: un nombre como `../pom.xml` se rechaza.
+
+## Interfaz Swing (`--swing`)
 
 | Zona | Funciones |
 |---|---|
@@ -127,15 +172,32 @@ src/main/java/com/airtortilla
 ├── util/
 │   ├── MergeSort.java            Ordenación genérica O(n log n)
 │   └── BusquedaBinaria.java      Búsqueda O(log n)
-└── ui/
-    ├── VentanaPrincipal.java     Interfaz gráfica (Swing)
-    └── ConsolaUI.java            Interfaz de terminal
+├── ui/
+│   ├── VentanaPrincipal.java     Interfaz gráfica (Swing)
+│   └── ConsolaUI.java            Interfaz de terminal
+└── web/
+    ├── AirTortillaWebApp.java    Arranque de Spring Boot y creación de los servicios
+    └── ReservaController.java    API REST (JSON) que usa la página
+
+src/main/resources
+├── application.properties        Puerto y rutas por defecto
+└── static/                       Página web
+    ├── index.html
+    ├── css/app.css
+    └── js/
+        ├── app.js                Llama a la API y pinta los datos
+        ├── globo.js              Globo terráqueo 3D
+        ├── despegue.js           Avión 3D del despegue
+        └── tortilla.js           Tortilla de patatas 3D
+    ├── lib/three.min.js          Three.js r128 (incluido para funcionar sin internet)
+    └── img/                      Texturas de la Tierra
 ```
 
 Por capas: la interfaz solo habla con los servicios, y los servicios no saben de dónde vienen los datos.
 Para migrar a otra fuente (por ejemplo una base de datos con JDBC) basta con añadir otra
 implementación de `ReservaRepository`, sin tocar el resto. Para otra interfaz (web, JavaFX), basta con
-añadir otra clase en `ui` (así se hizo en la versión 1.1.0 con `VentanaPrincipal`, sin cambiar ningún servicio).
+añadir otra capa de interfaz: así se hizo en la 1.1.0 con `VentanaPrincipal` y en la 2.0.0 con el paquete `web`,
+sin cambiar la lógica de ningún servicio. Las tres interfaces siguen funcionando a la vez.
 
 ## Complejidad algorítmica
 
@@ -154,3 +216,4 @@ añadir otra clase en `ui` (así se hizo en la versión 1.1.0 con `VentanaPrinci
 |---|---|---|
 | 1.0.0 | 2026-10-14 | Primera entrega: lectura de CSV, localizadores, ficheros por país de destino, consulta total y línea a línea, ordenación y búsqueda. Stack: Java 21 + consola + ficheros. |
 | 1.1.0 | 2026-10-14 | **Migración de interfaz: terminal → interfaz gráfica nativa (Swing).** Nueva clase `VentanaPrincipal` con pestañas de reservas y ficheros, y panel de feedback. La consola se mantiene con `--consola`. Los servicios no cambian; solo se añade `ConsultaFicheros.abrir()` para la lectura línea a línea desde botones. |
+| 2.0.0 | 2026-10-14 | **Migración de interfaz: escritorio → web.** Se añade Spring Boot: `AirTortillaWebApp` arranca un servidor en localhost:8080 y `ReservaController` expone una API REST en JSON. Página nueva en HTML/CSS/JS con estética de aeropuerto, globo 3D con Three.js, subida de CSV por arrastre y visor de ficheros. La web pasa a ser la interfaz por defecto; Swing (`--swing`) y consola (`--consola`) se mantienen. En los servicios solo se añade `ReservaService.getGruposLocalizador()`. |

@@ -117,6 +117,21 @@ public class ReservaService {
     }
 
     /**
+     * Devuelve los grupos con localizador, en orden (LOC-0001, LOC-0002...).
+     *
+     * @return mapa localizador → reservas del grupo
+     */
+    public Map<String, List<Reserva>> getGruposLocalizador() {
+        Map<String, List<Reserva>> grupos = new LinkedHashMap<>();
+        for (Reserva r : ordenar(Criterio.ID)) {
+            if (!r.getLocalizador().isEmpty()) {
+                grupos.computeIfAbsent(r.getLocalizador(), k -> new ArrayList<>()).add(r);
+            }
+        }
+        return grupos;
+    }
+
+    /**
      * Devuelve todas las reservas que comparten un localizador: O(n).
      *
      * @param localizador código del localizador (por ejemplo LOC-0001)
