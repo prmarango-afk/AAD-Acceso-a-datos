@@ -1,0 +1,4 @@
+IdReserva;NombrePasajero;Origen;PaisOrigen;Destino;PaisDestino;FechaReserva;NumeroVuelo
+R0001;Paula Gil;Atlanta;US;Berlin;DE;2020-07-02;AT3074
+R0002;Giulia Rossi;Lyon;FR;Berlin;DE;2020-07-01;AT6153
+R0003;Carlos Sánchez;Lyon;FR;Barcelona;ES;2020-07-02;AT5240
