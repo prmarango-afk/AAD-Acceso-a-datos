@@ -34,9 +34,9 @@ Enunciado completo: [`docs/enunciado_entrega2.pdf`](docs/enunciado_entrega2.pdf)
 
 | # | Tarea | Criterio de aceptación (hecha cuando…) | Estado |
 |---|---|---|---|
-| T1 | Entorno y proyecto Django | `runserver` arranca sin errores, `requirements.txt` en UTF-8 y `migrate` aplicado | [ ] casi |
-| T2 | Diseño del modelo relacional | Diagrama entidad-relación en `docs/` con tablas, claves y relaciones | [ ] |
-| T3 | Modelos y migraciones | `migrate` crea las tablas y se ven en el panel de administración | [ ] |
+| T1 | Entorno y proyecto Django | `runserver` arranca sin errores, `requirements.txt` en UTF-8 y `migrate` aplicado | [x] 2026-11-16 |
+| T2 | Diseño del modelo relacional | Diagrama entidad-relación en `docs/` con tablas, claves y relaciones | [x] 2026-11-16 |
+| T3 | Modelos y migraciones | `migrate` crea las tablas y se ven en el panel de administración | [x] 2026-11-16 |
 | T4 | Importar el CSV a la BD | `python manage.py importar_csv` carga las 71 reservas, informa de las líneas erróneas y no duplica si se ejecuta dos veces | [ ] |
 | T5 | Lógica sobre la BD | Localizadores, ordenación, búsqueda y ficheros por país funcionan leyendo de la BD | [ ] |
 | T6 | **US1 · Login** | Sin sesión iniciada no se accede a nada: web y API redirigen al login | [ ] |
@@ -57,14 +57,27 @@ Enunciado completo: [`docs/enunciado_entrega2.pdf`](docs/enunciado_entrega2.pdf)
 
 - `requirements.txt` generado (en UTF-8).
 
-**Pendiente para cerrar T1**
-- Aplicar las migraciones internas de Django:
-  ```
-  python manage.py migrate
-  ```
+**Hecho (2026-11-16, portátil)**
+- T1: `migrate` aplicado y `runserver` sin errores.
+- T2: diagrama E-R en `docs/diagrama_er.png` (hecho con dbdiagram.io).
+  5 tablas: `pais`, `ciudad` (FK país), `pasajero`, `reserva` (FK origen y destino → ciudad) y la intermedia reserva↔pasajero.
+  **Decisión**: Reserva–Pasajero es **N:M** aunque el CSV trae un pasajero por reserva, porque una reserva real puede llevar varios pasajeros.
+- T3: modelos en `reservas/models.py` (migraciones `0001` y `0002`) y registrados en `admin.py`; se ven en `/admin`. Superusuario creado en el portátil.
+  - `Reserva.localizador` guarda el `IdReserva` del CSV (`R0001`), único → sirve para no duplicar al importar.
+  - `Ciudad`: única la pareja nombre + país (`UniqueConstraint`), no el nombre solo.
+  - El DNI y otros datos del pasajero se dejan para más adelante (el CSV no los trae).
 
-**Siguiente paso**: T2, diseñar las tablas a partir de las columnas del CSV
-(`IdReserva;NombrePasajero;Origen;PaisOrigen;Destino;PaisDestino;FechaReserva;NumeroVuelo`).
+**Pendiente en cuanto vuelva**
+1. Plural en el admin: añadir `class Meta: verbose_name_plural = 'países'` en `Pais` y `'ciudades'` en el `Meta` de `Ciudad`.
+2. Commit + push (comprobar antes con `git status` que no entran `.venv/` ni `db.sqlite3`):
+   ```
+   git add .
+   git commit -m "T1-T3: entorno, diagrama E-R y modelos"
+   git push
+   ```
+3. En el PC de casa: `git pull`, `migrate` y `createsuperuser` (la BD no se sube).
+
+**Siguiente paso**: T4, comando `importar_csv`. Ojo: en el CSV los países vienen como código (`US`, `DE`) y las fechas sin hora (`2020-07-02`).
 
 ## 5. Ponerlo en marcha en otro ordenador
 
