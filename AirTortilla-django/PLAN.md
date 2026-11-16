@@ -37,7 +37,7 @@ Enunciado completo: [`docs/enunciado_entrega2.pdf`](docs/enunciado_entrega2.pdf)
 | T1 | Entorno y proyecto Django | `runserver` arranca sin errores, `requirements.txt` en UTF-8 y `migrate` aplicado | [x] 2026-11-16 |
 | T2 | Diseño del modelo relacional | Diagrama entidad-relación en `docs/` con tablas, claves y relaciones | [x] 2026-11-16 |
 | T3 | Modelos y migraciones | `migrate` crea las tablas y se ven en el panel de administración | [x] 2026-11-16 |
-| T4 | Importar el CSV a la BD | `python manage.py importar_csv` carga las 71 reservas, informa de las líneas erróneas y no duplica si se ejecuta dos veces | [ ] |
+| T4 | Importar el CSV a la BD | `python manage.py importar_csv` carga las 71 reservas, informa de las líneas erróneas y no duplica si se ejecuta dos veces | [x] 2026-11-16 |
 | T5 | Lógica sobre la BD | Localizadores, ordenación, búsqueda y ficheros por país funcionan leyendo de la BD | [ ] |
 | T6 | **US1 · Login** | Sin sesión iniciada no se accede a nada: web y API redirigen al login | [ ] |
 | T7 | **US2 · Alta de usuarios** | Un administrador crea un empleado desde el panel y ese empleado puede entrar | [ ] |
@@ -67,17 +67,15 @@ Enunciado completo: [`docs/enunciado_entrega2.pdf`](docs/enunciado_entrega2.pdf)
   - `Ciudad`: única la pareja nombre + país (`UniqueConstraint`), no el nombre solo.
   - El DNI y otros datos del pasajero se dejan para más adelante (el CSV no los trae).
 
-**Pendiente en cuanto vuelva**
-1. Plural en el admin: añadir `class Meta: verbose_name_plural = 'países'` en `Pais` y `'ciudades'` en el `Meta` de `Ciudad`.
-2. Commit + push (comprobar antes con `git status` que no entran `.venv/` ni `db.sqlite3`):
-   ```
-   git add .
-   git commit -m "T1-T3: entorno, diagrama E-R y modelos"
-   git push
-   ```
-3. En el PC de casa: `git pull`, `migrate` y `createsuperuser` (la BD no se sube).
+- Plurales del admin corregidos (`países`, `ciudades`).
+- T4: comando `python manage.py importar_csv` (`reservas/management/commands/importar_csv.py`).
+  - `get_or_create` para país, ciudad y pasajero; `update_or_create` por `localizador` para la reserva → no duplica.
+  - `try/except` por línea: informa de las erróneas (número de línea y motivo) y sigue.
+  - Resultado: 71 reservas, 22 pasajeros, 14 ciudades, 8 países. Ejecutado dos veces → siguen 71.
 
-**Siguiente paso**: T4, comando `importar_csv`. Ojo: en el CSV los países vienen como código (`US`, `DE`) y las fechas sin hora (`2020-07-02`).
+**En el PC de casa**: `git pull`, copiar el CSV a `AirTortilla/data/`, `migrate`, `createsuperuser` e `importar_csv` (la BD no se sube).
+
+**Siguiente paso**: T5, lógica sobre la BD (localizadores, ordenación, búsqueda y ficheros por país).
 
 ## 5. Ponerlo en marcha en otro ordenador
 
