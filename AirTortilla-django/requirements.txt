@@ -1,4 +1,9 @@
 asgiref==3.13.0
 Django==6.1.2
+django-simple-history==3.13.0
+gunicorn==27.0.1
+psycopg==3.3.9
+psycopg-binary==3.3.9
 sqlparse==0.6.1
 tzdata==2026.6
+whitenoise==6.12.0

@@ -39,13 +39,13 @@ Enunciado completo: [`docs/enunciado_entrega2.pdf`](docs/enunciado_entrega2.pdf)
 | T3 | Modelos y migraciones | `migrate` crea las tablas y se ven en el panel de administración | [x] 2026-11-16 |
 | T4 | Importar el CSV a la BD | `python manage.py importar_csv` carga las 71 reservas, informa de las líneas erróneas y no duplica si se ejecuta dos veces | [x] 2026-11-16 |
 | T5 | Lógica sobre la BD | Localizadores, ordenación, búsqueda y ficheros por país funcionan leyendo de la BD | [x] 2026-11-16 |
-| T6 | **US1 · Login** | Sin sesión iniciada no se accede a nada: web y API redirigen al login | [ ] |
-| T7 | **US2 · Alta de usuarios** | Un administrador crea un empleado desde el panel y ese empleado puede entrar | [ ] |
-| T8 | **US3 · Trazabilidad** | Cada alta, cambio o borrado de una reserva queda registrado con usuario, fecha y valores anteriores; también los inicios de sesión | [ ] |
-| T9 | API + web 3D | La web de la v2.0 funciona igual, pero sobre Django y con login | [ ] |
-| T10 | Versión terminal | `python manage.py airtortilla` muestra el menú de siempre (0-8) | [ ] |
-| T11 | Docker *(opcional)* | `docker compose up` arranca Django + PostgreSQL | [ ] |
-| T12 | Documentación | README con tareas, diagrama E-R, migración Java → Django e instrucciones | [ ] |
+| T6 | **US1 · Login** | Sin sesión iniciada no se accede a nada: web y API redirigen al login | [x] 2026-11-16 |
+| T7 | **US2 · Alta de usuarios** | Un administrador crea un empleado desde el panel y ese empleado puede entrar | [x] 2026-11-16 |
+| T8 | **US3 · Trazabilidad** | Cada alta, cambio o borrado de una reserva queda registrado con usuario, fecha y valores anteriores; también los inicios de sesión | [x] 2026-11-16 |
+| T9 | API + web 3D | La web de la v2.0 funciona igual, pero sobre Django y con login | [x] 2026-11-16 |
+| T10 | Versión terminal | `python manage.py airtortilla` muestra el menú de siempre (0-8) | [x] 2026-11-16 |
+| T11 | Docker *(opcional)* | `docker compose up` arranca Django + PostgreSQL | [x] 2026-11-16 |
+| T12 | Documentación | README con tareas, diagrama E-R, migración Java → Django e instrucciones | [x] 2026-11-16 |
 
 ## 4. Estado actual
 
@@ -82,7 +82,20 @@ Enunciado completo: [`docs/enunciado_entrega2.pdf`](docs/enunciado_entrega2.pdf)
   - `grupos_localizador()` / `buscar_por_localizador()`: se calculan con `GROUP BY` (no se guardan). Salen 3: LOC-0001 a LOC-0003.
   - `exportar_por_pais()`, `listar_ficheros()`, `leer_fichero()`: escribe en `AirTortilla-django/output/`. Comprobado: 27 ficheros idénticos a los de la versión Java.
 
-**Siguiente paso**: T6, login (US1).
+**Hecho por Claude (2026-11-16, tarde-noche, mientras estaba fuera) — todo probado**
+- T6 · Login: `LoginRequiredMiddleware` + `LOGIN_URL` en `settings.py`; rutas `accounts/`; pantalla `templates/registration/login.html`.
+- T7 · Roles: migración `0004_grupos_roles.py` crea **Agente / Supervisor / Administrador de sistemas** (jerarquía por permisos acumulados).
+- T8 · Trazabilidad: `django-simple-history` (`history = HistoricalRecords()` en los 4 modelos, migración `0005`) + `RegistroAcceso` con señales de login/logout/fallo (`signals.py`, conectadas en `apps.py`); permiso para el Administrador (`0006`). `populate_history --auto` ya ejecutado en el portátil.
+- La importación se movió a `servicios.importar_csv()` (la usan el comando y la web), con las validaciones de Java, `transaction.atomic` por línea y sin guardar si no cambia nada.
+- T9 · Web: `api.py` + `reservas/urls.py` (mismas rutas que Java), web copiada a `reservas/static/web/` y `templates/web/index.html` (usuario + Panel + Cerrar sesión; CSRF en `app.js`).
+- T10 · Menú: `management/commands/airtortilla.py` (opciones 0-8 como `ConsolaUI`).
+- T11 · Docker: `Dockerfile`, `docker-compose.yml` (web + postgres:17), `docker-entrypoint.sh`, `.env.example`; `settings.py` lee BD y claves de variables de entorno; WhiteNoise sirve los estáticos. Probado con PostgreSQL: 71 reservas y 3 roles.
+- T12 · `README.md` de `AirTortilla-django` y enlace en el README principal.
+
+**Pendiente (Pato)**
+1. Repasar los cambios y hacer commit + push.
+2. Probar en el navegador: login, web 3D, botón «Cerrar sesión», panel con «History» y «Registros de acceso».
+3. En el PC de casa: `git pull`, `pip install -r requirements.txt`, copiar el CSV, `migrate`, `createsuperuser`, `importar_csv`, `populate_history --auto`.
 
 ## 5. Ponerlo en marcha en otro ordenador
 

@@ -10,22 +10,24 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
+# En local se usan los valores por defecto (desarrollo).
+# En Docker («producción») se leen de variables de entorno: ver docker-compose.yml y .env.example
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-)7zjev@z3kbp=4p=d8!c!y^j$28gx1v1v)^7iuh1582sg0w*at',
+)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)7zjev@z3kbp=4p=d8!c!y^j$28gx1v1v)^7iuh1582sg0w*at'
+DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [h for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if h]
+CSRF_TRUSTED_ORIGINS = [o for o in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if o]
 
 
 # Application definition
@@ -37,20 +39,29 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'simple_history',
     'reservas',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # sirve CSS, JS e imágenes sin DEBUG (Docker)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.LoginRequiredMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
+
+# Login (US1): sin sesión se redirige aquí; tras entrar o salir, a la portada
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'login'
 
 TEMPLATES = [
     {
@@ -73,12 +84,25 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# SQLite en local; PostgreSQL si están las variables POSTGRES_* (Docker)
+if os.environ.get('POSTGRES_DB'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ['POSTGRES_DB'],
+            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+            'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -116,6 +140,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # «collectstatic» junta aquí los estáticos (Docker)
 
 
 # Email

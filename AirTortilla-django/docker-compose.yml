@@ -1,0 +1,33 @@
+# Despliegue de AirTortilla: Django (web) + PostgreSQL (db)
+# Uso: copiar .env.example a .env, cambiar las contraseñas y ejecutar «docker compose up --build»
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - datos_postgres:/var/lib/postgresql/data   # los datos sobreviven al apagar los contenedores
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 3s
+      retries: 20
+
+  web:
+    build: .
+    env_file: .env
+    environment:
+      POSTGRES_HOST: db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../AirTortilla/data:/AirTortilla/data:ro   # el CSV (no está en GitHub)
+      - ficheros_salida:/app/output                # ficheros por país generados
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  datos_postgres:
+  ficheros_salida:

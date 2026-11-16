@@ -1,7 +1,70 @@
+import csv
+import re
+from datetime import date
+
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Count, Min
 
-from reservas.models import Reserva
+from reservas.models import Pais, Ciudad, Pasajero, Reserva
+
+CSV_POR_DEFECTO = settings.BASE_DIR.parent / 'AirTortilla' / 'data' / 'AirTortilla_Reservas_2020.csv'
+COLUMNAS = ['IdReserva', 'NombrePasajero', 'Origen', 'PaisOrigen', 'Destino', 'PaisDestino', 'FechaReserva', 'NumeroVuelo']
+
+
+def importar_csv(fichero):
+    """
+    Importa al BD las reservas de un CSV ya abierto (texto). No duplica: si la reserva
+    ya existe, solo la actualiza si algún dato ha cambiado.
+    Devuelve (número de líneas correctas, lista de errores «Línea N: motivo»).
+    """
+    correctas = 0
+    errores = []
+    vistos = set()
+    lector = csv.DictReader(fichero, delimiter=';')
+    for num_linea, fila in enumerate(lector, start=2):
+        try:
+            with transaction.atomic():  # si la línea falla, no se queda nada a medias
+                _importar_fila(fila, vistos)
+            correctas += 1
+        except Exception as e:
+            errores.append(f'Línea {num_linea}: {e}')
+    return correctas, errores
+
+
+def _importar_fila(fila, vistos):
+    """Valida una fila del CSV y la guarda en la BD (mismas reglas que la versión Java)."""
+    if None in fila or any(fila.get(c) is None for c in COLUMNAS):
+        raise ValueError(f'se esperaban {len(COLUMNAS)} columnas')
+    datos = {c: fila[c].strip() for c in COLUMNAS}
+    for i, c in enumerate(COLUMNAS, start=1):
+        if not datos[c]:
+            raise ValueError(f'columna {i} vacía')
+    for c in ['PaisOrigen', 'PaisDestino']:
+        if not re.fullmatch(r'[A-Z]{2}', datos[c]):
+            raise ValueError(f'{c} debe ser un código ISO de 2 letras: {datos[c]}')
+    fecha = date.fromisoformat(datos['FechaReserva'])
+    if datos['IdReserva'] in vistos:
+        raise ValueError(f"id duplicado {datos['IdReserva']}")
+    vistos.add(datos['IdReserva'])
+
+    pais_origen, _ = Pais.objects.get_or_create(nombre=datos['PaisOrigen'])
+    origen, _ = Ciudad.objects.get_or_create(nombre=datos['Origen'], pais=pais_origen)
+    pais_destino, _ = Pais.objects.get_or_create(nombre=datos['PaisDestino'])
+    destino, _ = Ciudad.objects.get_or_create(nombre=datos['Destino'], pais=pais_destino)
+    pasajero, _ = Pasajero.objects.get_or_create(nombre=datos['NombrePasajero'])
+
+    nuevos = {'num_vuelo': datos['NumeroVuelo'], 'fecha_reserva': fecha, 'origen': origen, 'destino': destino}
+    reserva = Reserva.objects.filter(codigo=datos['IdReserva']).first()
+    if reserva is None:
+        reserva = Reserva.objects.create(codigo=datos['IdReserva'], **nuevos)
+    elif any(getattr(reserva, campo) != valor for campo, valor in nuevos.items()):
+        # Solo se guarda si cambia algo: así el historial (US3) no se llena de cambios vacíos
+        for campo, valor in nuevos.items():
+            setattr(reserva, campo, valor)
+        reserva.save()
+    if not reserva.pasajeros.filter(pk=pasajero.pk).exists():
+        reserva.pasajeros.add(pasajero)
 
 CRITERIOS = {
     'id': 'codigo',
