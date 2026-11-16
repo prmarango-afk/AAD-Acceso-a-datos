@@ -38,7 +38,7 @@ Enunciado completo: [`docs/enunciado_entrega2.pdf`](docs/enunciado_entrega2.pdf)
 | T2 | Diseño del modelo relacional | Diagrama entidad-relación en `docs/` con tablas, claves y relaciones | [x] 2026-11-16 |
 | T3 | Modelos y migraciones | `migrate` crea las tablas y se ven en el panel de administración | [x] 2026-11-16 |
 | T4 | Importar el CSV a la BD | `python manage.py importar_csv` carga las 71 reservas, informa de las líneas erróneas y no duplica si se ejecuta dos veces | [x] 2026-11-16 |
-| T5 | Lógica sobre la BD | Localizadores, ordenación, búsqueda y ficheros por país funcionan leyendo de la BD | [ ] |
+| T5 | Lógica sobre la BD | Localizadores, ordenación, búsqueda y ficheros por país funcionan leyendo de la BD | [x] 2026-11-16 |
 | T6 | **US1 · Login** | Sin sesión iniciada no se accede a nada: web y API redirigen al login | [ ] |
 | T7 | **US2 · Alta de usuarios** | Un administrador crea un empleado desde el panel y ese empleado puede entrar | [ ] |
 | T8 | **US3 · Trazabilidad** | Cada alta, cambio o borrado de una reserva queda registrado con usuario, fecha y valores anteriores; también los inicios de sesión | [ ] |
@@ -75,7 +75,14 @@ Enunciado completo: [`docs/enunciado_entrega2.pdf`](docs/enunciado_entrega2.pdf)
 
 **En el PC de casa**: `git pull`, copiar el CSV a `AirTortilla/data/`, `migrate`, `createsuperuser` e `importar_csv` (la BD no se sube).
 
-**Siguiente paso**: T5, lógica sobre la BD (localizadores, ordenación, búsqueda y ficheros por país).
+- `Reserva.localizador` renombrado a `codigo` (migración `0003`, `RenameField`): en la versión Java «localizador» es otra cosa (`LOC-0001`).
+- T5: `reservas/servicios.py` (equivale a `ReservaService` + `ExportadorPorPais` + `ConsultaFicheros` de Java):
+  - `reservas_ordenadas(criterio)`: `id`, `fecha`, `pasajero`, `pais_destino` con `order_by`.
+  - `buscar_por_codigo(codigo)`: sin distinguir mayúsculas; `None` si no existe.
+  - `grupos_localizador()` / `buscar_por_localizador()`: se calculan con `GROUP BY` (no se guardan). Salen 3: LOC-0001 a LOC-0003.
+  - `exportar_por_pais()`, `listar_ficheros()`, `leer_fichero()`: escribe en `AirTortilla-django/output/`. Comprobado: 27 ficheros idénticos a los de la versión Java.
+
+**Siguiente paso**: T6, login (US1).
 
 ## 5. Ponerlo en marcha en otro ordenador
 

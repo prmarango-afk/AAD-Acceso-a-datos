@@ -21,7 +21,7 @@ class Command(BaseCommand):
                     pais_destino, _ = Pais.objects.get_or_create(nombre=fila['PaisDestino'])
                     destino, _ = Ciudad.objects.get_or_create(nombre=fila['Destino'], pais=pais_destino)
                     pasajero, _ = Pasajero.objects.get_or_create(nombre=fila['NombrePasajero'])
-                    reserva, _ = Reserva.objects.update_or_create(localizador=fila['IdReserva'], defaults={
+                    reserva, _ = Reserva.objects.update_or_create(codigo=fila['IdReserva'], defaults={
                         'num_vuelo': fila['NumeroVuelo'],
                         'fecha_reserva': date.fromisoformat(fila['FechaReserva']),
                         'origen': origen,

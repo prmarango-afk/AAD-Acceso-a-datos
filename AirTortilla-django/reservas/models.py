@@ -31,7 +31,7 @@ class Pasajero(models.Model):
         return self.nombre
 
 class Reserva(models.Model):
-    localizador = models.CharField(max_length=10, unique=True)
+    codigo = models.CharField(max_length=10, unique=True)
     num_vuelo = models.CharField(max_length=16)
     fecha_reserva = models.DateField()
     origen = models.ForeignKey(Ciudad, on_delete=models.PROTECT, related_name='reservas_origen')
@@ -39,7 +39,7 @@ class Reserva(models.Model):
     pasajeros = models.ManyToManyField(Pasajero, related_name='reservas')
     
     def __str__(self):
-        return self.localizador
+        return self.codigo
   
 
     
