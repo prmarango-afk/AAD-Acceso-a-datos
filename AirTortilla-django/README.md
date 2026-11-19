@@ -3,7 +3,7 @@
 Sistema de reservas de AirTortilla migrado de **Java (CSV en memoria)** a **Python + Django con base de datos relacional**.
 Añade login (US1), alta de usuarios por roles (US2) y trazabilidad de los cambios (US3).
 
-- **Stack**: Python 3.14 · Django 6.1 · SQLite en local · PostgreSQL en Docker
+- **Stack**: Python 3.10 o superior · Django 5.2 LTS · SQLite en local · PostgreSQL en Docker
 - **Versión anterior** (Java, v2.0.0): carpeta [`../AirTortilla`](../AirTortilla/README.md), sin cambios.
 - **Enunciado**: [`docs/enunciado_entrega2.pdf`](docs/enunciado_entrega2.pdf)
 
@@ -98,9 +98,11 @@ Comprobado: los 27 ficheros por país que genera Django son **idénticos** a los
 
 ### En local (SQLite)
 
+Requisito: **Python 3.10 o superior** (compruébalo con `python --version`).
+
 ```powershell
 cd AirTortilla-django
-py -3.14 -m venv .venv                     # solo la primera vez
+python -m venv .venv                       # solo la primera vez
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python manage.py migrate                   # crea las tablas y los 3 roles
