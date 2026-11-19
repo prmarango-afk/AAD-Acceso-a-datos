@@ -22,7 +22,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ../AirTortilla/data:/AirTortilla/data:ro   # el CSV (no está en GitHub)
+      - ../AirTortilla/data:/AirTortilla/data:ro   # el CSV del enunciado
       - ficheros_salida:/app/output                # ficheros por país generados
     depends_on:
       db:

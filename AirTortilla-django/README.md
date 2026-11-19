@@ -111,7 +111,7 @@ python manage.py importar_csv              # carga AirTortilla/data/AirTortilla_
 python manage.py runserver                 # http://127.0.0.1:8000
 ```
 
-> El CSV no está en GitHub: hay que copiarlo a `AirTortilla/data/`.
+> El CSV del enunciado ya viene en `AirTortilla/data/`. En la web, el botón **Cargar CSV por defecto** lo importa y rellena los contadores y la tabla.
 
 ### Con Docker (PostgreSQL)
 

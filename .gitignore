@@ -11,6 +11,7 @@ build/
 # Datos (no se suben)
 *.csv
 !**/ejemplo*.csv
+!AirTortilla/data/AirTortilla_Reservas_2020.csv
 
 # Ficheros generados por la aplicación
 **/output/

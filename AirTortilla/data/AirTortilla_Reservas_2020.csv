@@ -1,0 +1,72 @@
+IdReserva;NombrePasajero;Origen;PaisOrigen;Destino;PaisDestino;FechaReserva;NumeroVuelo
+R0001;Paula Gil;Atlanta;US;Berlin;DE;2020-07-02;AT3074
+R0002;Giulia Rossi;Lyon;FR;Berlin;DE;2020-07-01;AT6153
+R0003;Carlos Sánchez;Lyon;FR;Barcelona;ES;2020-07-02;AT5240
+R0004;Pablo Díaz;Londres;GB;Milan;IT;2020-07-02;AT7722
+R0005;Paula Gil;Londres;GB;Atlanta;US;2020-07-02;AT2645
+R0006;Emma Brown;Atlanta;US;Milan;IT;2020-03-15;AT5450
+R0007;Laura Navarro;Barcelona;ES;Nueva York;US;2020-03-16;AT9911
+R0008;Pierre Dubois;Valencia;ES;Roma;IT;2020-03-15;AT1646
+R0009;Ana García;Mexico DF;MX;Berlin;DE;2020-03-15;AT4317
+R0010;John Smith;Roma;IT;Atlanta;US;2020-07-02;AT5457
+R0011;Pablo Díaz;Mexico DF;MX;Berlin;DE;2020-07-02;AT8743
+R0012;Irene Serrano;Valencia;ES;Mexico DF;MX;2020-03-16;AT8752
+R0013;Javier Ruiz;Berlin;DE;Lyon;FR;2020-03-16;AT7227
+R0014;Emma Brown;Berlin;DE;Milan;IT;2020-07-02;AT6900
+R0015;Ana García;Londres;GB;Munich;DE;2020-12-20;AT7300
+R0016;John Smith;Valencia;ES;Munich;DE;2020-07-01;AT4180
+R0017;Paula Gil;Roma;IT;Milan;IT;2020-12-20;AT9788
+R0018;Sara Moreno;Roma;IT;Madrid;ES;2020-07-02;AT6735
+R0019;Marta López;Berlin;DE;Milan;IT;2020-03-15;AT3835
+R0020;Sara Moreno;Paris;FR;Berlin;DE;2020-07-02;AT1688
+R0021;John Smith;Nueva York;US;Barcelona;ES;2020-03-15;AT6603
+R0022;Ana García;Nueva York;US;Paris;FR;2020-07-02;AT1238
+R0023;John Smith;Atlanta;US;Londres;GB;2020-12-20;AT8233
+R0024;John Smith;Lisboa;PT;Nueva York;US;2020-07-02;AT6634
+R0025;Elena Gómez;Madrid;ES;Lyon;FR;2020-03-16;AT8872
+R0026;Hugo Torres;Atlanta;US;Madrid;ES;2020-07-01;AT7391
+R0027;Irene Serrano;Roma;IT;Munich;DE;2020-12-20;AT4267
+R0028;Diego Romero;Barcelona;ES;Nueva York;US;2020-07-01;AT9504
+R0029;Carlos Sánchez;Valencia;ES;Milan;IT;2020-03-16;AT3266
+R0030;Carlos Sánchez;Milan;IT;Munich;DE;2020-12-20;AT3243
+R0031;Sara Moreno;Barcelona;ES;Nueva York;US;2020-07-02;AT9715
+R0032;John Smith;Atlanta;US;Berlin;DE;2020-07-02;AT1157
+R0033;Emma Brown;Roma;IT;Valencia;ES;2020-07-02;AT6580
+R0034;Lucía Martín;Madrid;ES;Paris;FR;2020-12-20;AT8812
+R0035;Hans Müller;Berlin;DE;Munich;DE;2020-03-15;AT3227
+R0036;Álvaro Vázquez;Madrid;ES;Nueva York;US;2020-03-15;AT8730
+R0037;Lucía Martín;Nueva York;US;Paris;FR;2020-03-16;AT8727
+R0038;Diego Romero;Londres;GB;Lyon;FR;2020-07-02;AT6498
+R0039;Álvaro Vázquez;Milan;IT;Paris;FR;2020-07-01;AT5552
+R0040;Giulia Rossi;Lisboa;PT;Munich;DE;2020-03-15;AT1234
+R0041;Pablo Díaz;Paris;FR;Roma;IT;2020-07-02;AT6927
+R0042;Hugo Torres;Milan;IT;Londres;GB;2020-07-01;AT9207
+R0043;Paula Gil;Londres;GB;Paris;FR;2020-07-01;AT3519
+R0044;Diego Romero;Munich;DE;Nueva York;US;2020-03-15;AT8230
+R0045;Hans Müller;Mexico DF;MX;Valencia;ES;2020-07-02;AT4665
+R0046;Lucía Martín;Lisboa;PT;Madrid;ES;2020-07-02;AT7608
+R0047;Laura Navarro;Atlanta;US;Barcelona;ES;2020-03-16;AT2316
+R0048;Elena Gómez;Mexico DF;MX;Lyon;FR;2020-07-01;AT2038
+R0049;Laura Navarro;Londres;GB;Barcelona;ES;2020-03-16;AT4657
+R0050;Carlos Sánchez;Londres;GB;Atlanta;US;2020-03-16;AT7909
+R0051;Irene Serrano;Paris;FR;Berlin;DE;2020-12-20;AT8468
+R0052;Diego Romero;Lyon;FR;Paris;FR;2020-03-15;AT2198
+R0053;Emma Brown;Madrid;ES;Munich;DE;2020-07-01;AT1767
+R0054;Pierre Dubois;Madrid;ES;Milan;IT;2020-03-15;AT5226
+R0055;Javier Ruiz;Madrid;ES;Mexico DF;MX;2020-03-15;AT9983
+R0056;Álvaro Vázquez;Berlin;DE;Lyon;FR;2020-07-02;AT4850
+R0057;Pablo Díaz;Roma;IT;Lyon;FR;2020-12-20;AT4913
+R0058;Laura Navarro;Mexico DF;MX;Valencia;ES;2020-03-15;AT2701
+R0059;Pierre Dubois;Barcelona;ES;Roma;IT;2020-03-16;AT5491
+R0060;Hugo Torres;Mexico DF;MX;Roma;IT;2020-12-20;AT9327
+R0061;María Fernández;Madrid;ES;Paris;FR;2020-03-15;AT1234
+R0062;María Fernández;Madrid;ES;Paris;FR;2020-03-15;AT1234
+R0063;María Fernández;Madrid;ES;Paris;FR;2020-03-15;AT1234
+R0064;María Fernández;Madrid;ES;Paris;FR;2020-03-15;AT1234
+R0065;María Fernández;Madrid;ES;Paris;FR;2020-03-15;AT1234
+R0066;María Fernández;Madrid;ES;Paris;FR;2020-03-15;AT1234
+R0067;José Rodríguez;Barcelona;ES;Roma;IT;2020-07-01;AT5678
+R0068;José Rodríguez;Barcelona;ES;Roma;IT;2020-07-01;AT5678
+R0069;José Rodríguez;Barcelona;ES;Roma;IT;2020-07-01;AT5678
+R0070;David Jiménez;Valencia;ES;Nueva York;US;2020-12-20;AT9012
+R0071;David Jiménez;Valencia;ES;Nueva York;US;2020-12-20;AT9012
